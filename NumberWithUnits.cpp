@@ -1,8 +1,3 @@
-/*NumberWithUnits& operator+=(const NumberWithUnits& other) {
-            bunit.unit_num+= other.bunit.unit_num;
-            sunit.unit_num+= other.sunit.unit_num;
-            return *this; // for call chaining
-        }*/
 #include<iostream>
 #include<string>
 #include <fstream>
@@ -17,6 +12,7 @@ using namespace ariel;
 static std::map<std::string,std::map<std::string,double>> units;
 const double eps = 0.0001;
 
+/*check if the given type is exist*/
 static bool find_type(const string& type)
 {    
     try
@@ -30,7 +26,7 @@ static bool find_type(const string& type)
     }
 }
 
-    
+/*check connection between 2 types*/
 static double check_legal_types(const string& type1,const string& type2)
 {
     if(type1==type2)
@@ -48,6 +44,7 @@ static double check_legal_types(const string& type1,const string& type2)
     
 }
 
+/*for read_units, connect between types with a common type*/
 static void undirect_convert()
 {
     
@@ -76,7 +73,7 @@ static void undirect_convert()
     }
 }
 
-
+/*string constructor*/
 NumberWithUnits::NumberWithUnits(double num, const string& unit) 
 {
     if(!find_type(unit))
@@ -89,7 +86,7 @@ NumberWithUnits::NumberWithUnits(double num, const string& unit)
 
 }
 
-
+/*char* constructor*/
 NumberWithUnits::NumberWithUnits(double num,  const char* unit) 
 {
 
@@ -102,8 +99,7 @@ NumberWithUnits::NumberWithUnits(double num,  const char* unit)
     unit_type=unit_t;
 }
 
-
-
+/*get file input and check is exceptedchar is the next char*/
 static bool get_check_nxt_char(ifstream& input, char expectedChar) 
 {
     char actualChar{};
@@ -111,6 +107,7 @@ static bool get_check_nxt_char(ifstream& input, char expectedChar)
     return (actualChar==expectedChar);
 }
 
+/*get file input and extract the units and the ratio batween them*/
 void NumberWithUnits::read_units(ifstream& units_file)
 {
     ios::pos_type startPosition = units_file.tellg();
@@ -139,8 +136,6 @@ void NumberWithUnits::read_units(ifstream& units_file)
     undirect_convert();
 }
 
-
-
 NumberWithUnits ariel::operator+(const NumberWithUnits& u1,const NumberWithUnits& u2)
 {
     double ratio=0;
@@ -158,6 +153,7 @@ NumberWithUnits ariel::operator+(const NumberWithUnits& u1,const NumberWithUnits
     throw invalid_argument("invalid types");
 
 }
+
 NumberWithUnits& NumberWithUnits::operator+=(const NumberWithUnits& other)
 {
     double ratio=0;
@@ -351,10 +347,12 @@ NumberWithUnits NumberWithUnits::operator* (double x)
 {
     return NumberWithUnits(unit_num*x,unit_type);
 } 
+
 NumberWithUnits ariel::operator*(double x, const NumberWithUnits& n)
 {
     return NumberWithUnits(n.unit_num*x,n.unit_type);
 }
+
 std::ostream& ariel::operator<< (std::ostream& os, const NumberWithUnits& n)
 {
     return (os<<n.unit_num<<'['<<n.unit_type<<']');
@@ -368,6 +366,7 @@ static bool get_check_nxt_char(istream& input, char expectedChar)
 
 }
 
+/*for oprator>>, split between the type and the ']' if necessary and extract the type*/
 static bool get_type_check_closer(istream& input,string& type) 
 {
     string str{};
@@ -386,22 +385,17 @@ static bool get_type_check_closer(istream& input,string& type)
 std::istream& ariel::operator>> (std::istream& is, NumberWithUnits& n)
 {
 
-double unit_num=0;
-string unit_type{};   
-if ( (!(is >> unit_num))                 ||
-        (!(get_check_nxt_char(is,'[')))  ||
-        (!(get_type_check_closer(is,unit_type))))
-        
-{
-    throw invalid_argument("invalid input");
-}
-    n.unit_num=unit_num;
-    n.unit_type=unit_type;
+    double unit_num=0;
+    string unit_type{};   
+    if ( (!(is >> unit_num))                 ||
+            (!(get_check_nxt_char(is,'[')))  ||
+            (!(get_type_check_closer(is,unit_type))))
+            
+    {
+        throw invalid_argument("invalid input");
+    }
+        n.unit_num=unit_num;
+        n.unit_type=unit_type;
 
-return is;
+    return is;
 }    
-
-
-
-
-
